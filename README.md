@@ -76,3 +76,5 @@ The tool successfully demonstrates feasibility for software-based predictive coo
 
 This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
 
+![Star history](https://www.star-history.com/?repos=vk22006%2Fpredictive-cooling-optimizer-for-data-centers&type=date&legend=top-left)
+
