@@ -81,9 +81,31 @@
   box-shadow: 0 0 12px -2px rgba(6, 182, 212, 0.25);
 }
 
-/* Background overlay vignette */
+/* Multi-layered data-center background overlay:
+   - Layer 1: Ambient cyan/cool lighting accent following the server room light trails
+   - Layer 2: Targeted center reading veil behind headings and hero content for accessibility
+   - Layer 3: Vertical edge gradient maintaining top header foundation and bottom anchoring
+   - Layer 4: Soft peripheral vignette that keeps server racks & ambient lighting visible at 40-50%
+*/
 .bg-vignette {
-  background: radial-gradient(circle at 50% 20%, rgba(11, 18, 33, 0.55) 0%, rgba(5, 8, 16, 0.88) 75%, rgba(3, 5, 10, 0.95) 100%);
+  background:
+    /* Layer 1: Ambient cyan industrial illumination along ceiling/lighting corridor */
+    radial-gradient(ellipse 70% 50% at 75% 20%, rgba(6, 182, 212, 0.10) 0%, transparent 70%),
+    /* Layer 2: Focused reading veil behind primary page headings & hero text */
+    radial-gradient(ellipse 65% 50% at 50% 28%, rgba(8, 12, 22, 0.45) 0%, rgba(8, 12, 22, 0.25) 60%, transparent 100%),
+    /* Layer 3: Vertical framing gradient (stabilizes header & footer legibility) */
+    linear-gradient(180deg, rgba(6, 9, 18, 0.50) 0%, rgba(6, 9, 18, 0.15) 20%, rgba(6, 9, 18, 0.10) 65%, rgba(5, 8, 16, 0.38) 100%),
+    /* Layer 4: Soft peripheral vignette (reduced darkness to reveal server racks and corridor) */
+    radial-gradient(ellipse 110% 90% at 50% 45%, transparent 45%, rgba(5, 8, 16, 0.22) 75%, rgba(3, 5, 12, 0.42) 100%);
+}
+
+@media (max-width: 640px) {
+  .bg-vignette {
+    background:
+      radial-gradient(ellipse 85% 50% at 50% 25%, rgba(8, 12, 22, 0.52) 0%, rgba(8, 12, 22, 0.32) 70%, transparent 100%),
+      linear-gradient(180deg, rgba(6, 9, 18, 0.60) 0%, rgba(6, 9, 18, 0.24) 25%, rgba(4, 7, 14, 0.50) 100%),
+      radial-gradient(circle at 50% 50%, transparent 45%, rgba(3, 5, 12, 0.45) 100%);
+  }
 }
 
 .number-mono {
