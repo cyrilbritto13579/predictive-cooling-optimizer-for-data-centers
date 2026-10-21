@@ -82,9 +82,10 @@ def optimize_cooling(
     store: Optional[ModelStore] = None,
     adjustments: Optional[List[float]] = None,
     include_temp: bool = True,
+    temperature_constraint_max: Optional[float] = None,
 ) -> OptimizationResult:
     """Find the chilled-water-rate adjustment that minimises predicted
-    energy consumption.
+    energy consumption, optionally subject to a maximum temperature constraint.
 
     Parameters:
         energy_feature_row: a 1-row DataFrame matching the energy model's
@@ -94,15 +95,22 @@ def optimize_cooling(
         adjustments: list of additive deltas (L/sec) to try.
             Defaults to ``DEFAULT_ADJUSTMENTS``.
         include_temp: if True, also predict temperature at each candidate
-            point (requires building a temp-model input).
+            point (requires building a temp-model input). Automatically
+            set to True if temperature_constraint_max is provided.
+        temperature_constraint_max: optional maximum allowable predicted
+            cooling-water temperature in °C. When None, evaluation is
+            unconstrained (candidates are not gated by temperature).
 
     Returns:
-        OptimizationResult with baseline, optimised, savings, and the
-        full list of candidate points evaluated.
+        OptimizationResult with baseline, optimised, savings, evaluation status,
+        and the full list of candidate points evaluated.
     """
     store = store or ModelStore.get()
     if adjustments is None:
         adjustments = DEFAULT_ADJUSTMENTS
+
+    if temperature_constraint_max is not None:
+        include_temp = True
 
     if energy_feature_row.shape[0] != 1:
         raise ValueError(
@@ -125,8 +133,6 @@ def optimize_cooling(
         )
 
     candidates: List[CandidatePoint] = []
-    best_energy = baseline_energy
-    best_idx = -1
 
     for i, adj in enumerate(adjustments):
         test_cwr = current_cwr + adj
@@ -147,34 +153,89 @@ def optimize_cooling(
                 test_row, pred_energy, store
             )
 
+        satisfies_constraint: Optional[bool] = None
+        if temperature_constraint_max is not None:
+            satisfies_constraint = (
+                bool(pred_temp <= temperature_constraint_max)
+                if pred_temp is not None
+                else False
+            )
+
         candidate = CandidatePoint(
             chilled_water_rate_adjustment=adj,
             predicted_energy_kwh=pred_energy,
             predicted_temp_c=pred_temp,
             is_selected=False,
+            satisfies_constraint=satisfies_constraint,
         )
         candidates.append(candidate)
 
-        if pred_energy < best_energy:
-            best_energy = pred_energy
-            best_idx = i
+    # Candidate selection logic
+    best_idx = -1
+    best_energy = baseline_energy
+    feasible_candidate_found = True
+
+    if temperature_constraint_max is not None:
+        eligible_indices = [
+            idx for idx, c in enumerate(candidates)
+            if c.satisfies_constraint is True
+        ]
+        if not eligible_indices:
+            # No candidate satisfied the temperature constraint
+            evaluation_status = "no_feasible_candidate"
+            feasible_candidate_found = False
+            best_idx = -1
+            best_energy = baseline_energy
+        else:
+            evaluation_status = "constrained_optimal"
+            # Among eligible candidates, find the one with minimum predicted energy
+            min_eligible_idx = min(
+                eligible_indices,
+                key=lambda idx: candidates[idx].predicted_energy_kwh
+            )
+            min_eligible_energy = candidates[min_eligible_idx].predicted_energy_kwh
+
+            baseline_satisfies = (
+                baseline_temp is not None
+                and baseline_temp <= temperature_constraint_max
+            )
+            # If baseline satisfies and has lower or equal energy, keep baseline (best_idx = -1)
+            # If baseline violates constraint or eligible candidate has lower energy, pick the eligible candidate
+            if (not baseline_satisfies) or (min_eligible_energy < baseline_energy):
+                best_idx = min_eligible_idx
+                best_energy = min_eligible_energy
+            else:
+                best_idx = -1
+                best_energy = baseline_energy
+    else:
+        evaluation_status = "unconstrained"
+        # Standard unconstrained grid-search: lowest energy candidate
+        for i, c in enumerate(candidates):
+            if c.predicted_energy_kwh < best_energy:
+                best_energy = c.predicted_energy_kwh
+                best_idx = i
 
     # Mark the selected candidate
     if best_idx >= 0:
-        # Replace the candidate with is_selected=True (frozen dataclass)
         c = candidates[best_idx]
         candidates[best_idx] = CandidatePoint(
             chilled_water_rate_adjustment=c.chilled_water_rate_adjustment,
             predicted_energy_kwh=c.predicted_energy_kwh,
             predicted_temp_c=c.predicted_temp_c,
             is_selected=True,
+            satisfies_constraint=c.satisfies_constraint,
         )
 
-    savings = baseline_energy - best_energy
+    savings = max(0.0, baseline_energy - best_energy)
     savings_pct = (savings / baseline_energy * 100) if baseline_energy > 0 else 0.0
 
     # Generate suggestion
-    if best_idx >= 0 and savings > 0.01:
+    if evaluation_status == "no_feasible_candidate":
+        suggestion = (
+            f"No candidate satisfies temperature constraint (<= {temperature_constraint_max:.2f} C). "
+            f"Baseline setpoint retained."
+        )
+    elif best_idx >= 0 and savings > 0.01:
         best_adj = candidates[best_idx].chilled_water_rate_adjustment
         suggestion = (
             f"Adjust chilled-water rate by {best_adj:+.1f} L/sec "
@@ -191,6 +252,9 @@ def optimize_cooling(
         baseline_temp_c=baseline_temp,
         suggestion=suggestion,
         candidates=candidates,
+        evaluation_status=evaluation_status,
+        temperature_constraint_max=temperature_constraint_max,
+        feasible_candidate_found=feasible_candidate_found,
     )
 
 
