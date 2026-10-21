@@ -50,7 +50,6 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
         className="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat pointer-events-none transition-opacity duration-700"
         style={{
           backgroundImage: "url('/assets/background_1.jpg')",
-          backgroundAttachment: 'fixed',
         }}
       />
 
@@ -69,15 +68,15 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
       <footer className="relative z-10 w-full border-t border-white/5 py-4 px-4 sm:px-6 lg:px-8 mt-auto">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-400">
           <div className="flex items-center gap-2">
-            <span>Predictive Cooling Optimizer</span>
-            <span>•</span>
-            <span>Temperature-Aware Chiller Scheduling</span>
+            <span>Since 2025</span>
+            {/* <span></span>
+            <span>2025</span> */}
           </div>
           <div className="flex items-center gap-4 text-slate-400">
             <span>FastAPI Core: v1.0.0</span>
-            <span>•</span>
+            <span>|</span>
             <span>XGBoost Dual-Model Pipeline</span>
-            <span>•</span>
+            <span>|</span>
             <span className="text-slate-400">MIT License</span>
           </div>
         </div>
