@@ -91,3 +91,10 @@ streamlit run 1_Home.py
 
 இந்தத் திட்டம் MIT License-ன் கீழ் உரிமம் பெற்றுள்ளது. விவரங்களுக்கு [LICENSE](LICENSE) கோப்பைப் பார்க்கவும்.
 
+<a href="https://www.star-history.com/">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=vk22006/predictive-cooling-optimizer-for-data-centers&type=date&theme=dark&legend=top-left" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=vk22006/predictive-cooling-optimizer-for-data-centers&type=date&legend=top-left" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=vk22006/predictive-cooling-optimizer-for-data-centers&type=date&legend=top-left" />
+ </picture>
+</a>
