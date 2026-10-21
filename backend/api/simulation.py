@@ -92,7 +92,9 @@ def post_simulation_step(request: SimulationStepRequest) -> SimulationStepRespon
                 chilled_water_rate=round(float(np.clip(cwr + c.chilled_water_rate_adjustment, CHILLED_WATER_MIN, CHILLED_WATER_MAX)), 2),
                 predicted_energy_kwh=round(c.predicted_energy_kwh, 4),
                 predicted_temp_c=round(c.predicted_temp_c, 4) if c.predicted_temp_c is not None else None,
+                energy_delta_kwh=round(c.predicted_energy_kwh - opt_res.baseline_energy_kwh, 4),
                 is_selected=c.is_selected,
+                satisfies_temp_constraint=c.satisfies_constraint,
             )
             for c in opt_res.candidates
         ]
@@ -110,6 +112,9 @@ def post_simulation_step(request: SimulationStepRequest) -> SimulationStepRespon
             baseline_temp_c=round(opt_res.baseline_temp_c, 4) if opt_res.baseline_temp_c is not None else None,
             suggestion=opt_res.suggestion,
             candidates=candidates,
+            evaluation_status=opt_res.evaluation_status,
+            temperature_constraint_max=opt_res.temperature_constraint_max,
+            feasible_candidate_found=opt_res.feasible_candidate_found,
             units={"energy": "kWh", "flow_rate": "L/sec", "temperature": "°C"},
             disclaimer="Values represent counterfactual model-estimated energy differences, not physically measured real-world savings.",
         )
