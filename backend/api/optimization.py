@@ -68,6 +68,7 @@ def post_optimize(request: OptimizationRequest) -> OptimizationResponse:
         store=store,
         adjustments=request.adjustments,
         include_temp=request.include_temp,
+        temperature_constraint_max=request.temperature_constraint_max,
     )
 
     # Transform candidate points to API schema
@@ -78,13 +79,11 @@ def post_optimize(request: OptimizationRequest) -> OptimizationResponse:
     for c in core_result.candidates:
         cand_cwr = float(np.clip(current_cwr + c.chilled_water_rate_adjustment, CHILLED_WATER_MIN, CHILLED_WATER_MAX))
 
-        satisfies_temp = None
-        if request.temperature_constraint_max is not None and c.predicted_temp_c is not None:
-            satisfies_temp = bool(c.predicted_temp_c <= request.temperature_constraint_max)
-
         if c.is_selected:
             selected_adj = c.chilled_water_rate_adjustment
             selected_cwr = cand_cwr
+
+        energy_delta = c.predicted_energy_kwh - core_result.baseline_energy_kwh
 
         candidates.append(
             CandidatePointSchema(
@@ -92,8 +91,9 @@ def post_optimize(request: OptimizationRequest) -> OptimizationResponse:
                 chilled_water_rate=round(cand_cwr, 2),
                 predicted_energy_kwh=round(c.predicted_energy_kwh, 4),
                 predicted_temp_c=round(c.predicted_temp_c, 4) if c.predicted_temp_c is not None else None,
+                energy_delta_kwh=round(energy_delta, 4),
                 is_selected=c.is_selected,
-                satisfies_temp_constraint=satisfies_temp,
+                satisfies_temp_constraint=c.satisfies_constraint,
             )
         )
 
@@ -108,6 +108,9 @@ def post_optimize(request: OptimizationRequest) -> OptimizationResponse:
         baseline_temp_c=round(core_result.baseline_temp_c, 4) if core_result.baseline_temp_c is not None else None,
         suggestion=core_result.suggestion,
         candidates=candidates,
+        evaluation_status=core_result.evaluation_status,
+        temperature_constraint_max=core_result.temperature_constraint_max,
+        feasible_candidate_found=core_result.feasible_candidate_found,
         units={"energy": "kWh", "flow_rate": "L/sec", "temperature": "°C"},
         disclaimer="Values represent counterfactual model-estimated energy differences, not physically measured real-world savings.",
     )
