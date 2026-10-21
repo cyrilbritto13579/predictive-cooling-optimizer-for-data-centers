@@ -87,6 +87,7 @@ export interface CandidatePoint {
   chilled_water_rate: number;
   predicted_energy_kwh: number;
   predicted_temp_c: number | null;
+  energy_delta_kwh: number;
   is_selected: boolean;
   satisfies_temp_constraint?: boolean | null;
 }
@@ -111,6 +112,9 @@ export interface OptimizationResponse {
   baseline_temp_c: number | null;
   suggestion: string;
   candidates: CandidatePoint[];
+  evaluation_status: 'unconstrained' | 'constrained_optimal' | 'no_feasible_candidate';
+  temperature_constraint_max: number | null;
+  feasible_candidate_found: boolean;
   units: {
     energy: string;
     flow_rate: string;
