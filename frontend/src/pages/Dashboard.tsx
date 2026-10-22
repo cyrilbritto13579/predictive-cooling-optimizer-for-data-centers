@@ -251,12 +251,16 @@ export const Dashboard: React.FC = () => {
         />
 
         <KpiCard
-          label="Potential Energy Trimming"
-          value="—"
+          label="Optimization Potential"
+          value={currentFrame ? `${(currentFrame.potential_savings_pct * 100).toFixed(1)}` : '—'}
           unit="%"
           icon={<TrendingDown className="w-4 h-4" />}
-          delta={{ value: 'Awaiting Step', trend: 'neutral', label: 'Phase 7' }}
-          subtitle="Optimization Inactive"
+          delta={{
+            value: currentFrame ? 'Model Estimate' : 'Awaiting Data',
+            trend: currentFrame && currentFrame.potential_savings_pct > 0 ? 'positive' : 'neutral',
+            label: 'vs lagged baseline',
+          }}
+          subtitle={currentFrame ? 'Counterfactual Trim' : 'Inactive'}
         />
 
         <KpiCard
@@ -308,7 +312,7 @@ export const Dashboard: React.FC = () => {
         {/* Chart 2: Cooling Water Temperature Forecast */}
         <GlassCard
           title="Cooling Water Temperature Forecast"
-          subtitle="Chained thermal trajectory (°C) with safety boundary monitoring"
+          subtitle="Chained forward thermal trajectory (°C) from sequential inference"
           badge={
             <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-white/5 text-slate-300 border border-white/10">
               Tolerance ±1°C: 89.2%
@@ -340,17 +344,17 @@ export const Dashboard: React.FC = () => {
         <GlassCard variant="subtle" padding="sm">
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs text-slate-400 uppercase tracking-wider font-semibold">
-              Thermal Safety Status
+              Thermal Projection Status
             </span>
             <span className="text-xs font-medium text-cyan-300">
-              {currentFrame ? `Monitored: ${currentFrame.predicted_temp_c.toFixed(2)} °C` : 'Awaiting Data'}
+              {currentFrame ? `Projected: ${currentFrame.predicted_temp_c.toFixed(2)} °C` : 'Awaiting Data'}
             </span>
           </div>
           <div className="w-full bg-slate-800 rounded-full h-2 mb-2 overflow-hidden">
             <div className="bg-cyan-500/40 h-2 rounded-full w-[65%]" />
           </div>
           <span className="text-[11px] text-slate-400">
-            Thermal safety constraint evaluation will be active in Phase 7 optimization.
+            Model inference tracks 1-hour forward projected cooling-water temperature.
           </span>
         </GlassCard>
 
@@ -359,13 +363,13 @@ export const Dashboard: React.FC = () => {
             <span className="text-xs text-slate-400 uppercase tracking-wider font-semibold">
               Sliding Window Buffer
             </span>
-            <span className="text-xs font-medium text-cyan-300">46 Features Baked</span>
+            <span className="text-xs font-medium text-cyan-300">46 Features Active</span>
           </div>
           <div className="w-full bg-slate-800 rounded-full h-2 mb-2 overflow-hidden">
             <div className="bg-cyan-400 h-2 rounded-full w-[100%]" />
           </div>
           <span className="text-[11px] text-slate-400">
-            12-step lag and rolling statistics pre-computed in canonical replay fixture.
+            12-step lag and rolling statistics computed by canonical feature pipeline.
           </span>
         </GlassCard>
 
@@ -374,13 +378,13 @@ export const Dashboard: React.FC = () => {
             <span className="text-xs text-slate-400 uppercase tracking-wider font-semibold">
               Optimization Advisory
             </span>
-            <span className="text-xs font-medium text-slate-300">Awaiting Trigger</span>
+            <span className="text-xs font-medium text-slate-300">Available</span>
           </div>
           <div className="w-full bg-slate-800 rounded-full h-2 mb-2 overflow-hidden">
-            <div className="bg-slate-700 h-2 rounded-full w-[0%]" />
+            <div className="bg-emerald-500/50 h-2 rounded-full w-[100%]" />
           </div>
           <span className="text-[11px] text-slate-400">
-            Counterfactual grid search optimization connector scheduled for Phase 7.
+            Evaluate flow-rate candidate trade-offs on the Optimization workbench.
           </span>
         </GlassCard>
       </div>
