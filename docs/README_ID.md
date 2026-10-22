@@ -8,7 +8,7 @@
 
 Proyek ini bertujuan untuk mengatasi ketidakefisienan energi pada sistem pendinginan pusat data dengan mengembangkan model prediktif berbasis suhu yang mengoptimalkan penjadwalan chiller untuk mengurangi konsumsi energi sambil mempertahankan keamanan termal. Sistem pendinginan reaktif tradisional merespons perubahan suhu setelah perubahan tersebut terjadi, sehingga menyebabkan pemborosan energi dan pengoperasian chiller yang kurang optimal.
 
-![Halaman utama](img/home_page.PNG "Halaman utama")
+![Halaman utama](img/homePage.png "Halaman utama")
 
 ## Metodologi Proyek
 
@@ -50,42 +50,50 @@ Proses menjalankan program cukup sederhana. Ikuti langkah-langkah berikut.
 pip install -r requirements.txt
 ```
 
-2. Buka Command Prompt atau PowerShell dan masuk ke folder proyek:
+2. Jalankan layanan backend FastAPI (port 8000):
 
 ```bash
-cd <your-file-path>
+uvicorn backend.main:app --host 127.0.0.1 --port 8000
 ```
 
-3. Jalankan aplikasi menggunakan perintah berikut:
+3. Jalankan aplikasi frontend React (port 5173):
 
 ```bash
-streamlit run 1_Home.py
+cd frontend
+npm install
+npm run dev
 ```
 
 ## Tools yang Digunakan
 
-1. Anaconda Jupyter - untuk pelatihan dan pengujian model
-2. Streamlit Library - untuk implementasi frontend
-3. Joblib - untuk menangani file model `.pkl`
-4. NumPy
-5. Pandas
-6. Scikit-Learn
-7. XGBoost
+1. Anaconda Jupyter - untuk pelatihan awal dan pengujian ilmiah
+2. FastAPI & Uvicorn - untuk layanan komputasi backend
+3. React & Vite - untuk antarmuka web modern
+4. NumPy, Pandas & Scikit-Learn
+5. XGBoost - mesin regresi prediktif
 
 ## Algoritma yang Digunakan
 
 ### 1. Algoritma Prediksi
 
 * XGBoost (Extreme Gradient Boosting)
-* Random Forest Regressor
+* Sequential Chained Regression (inferensi berantai)
 
 ### 2. Algoritma Pendukung
 
 * Min-Max Normalization
-* Rolling Average (untuk feature engineering)
+* 46 Fitur Rekayasa (lag, statistik bergerak, dan interaksi)
 
-Tool ini berhasil menunjukkan kelayakan optimasi pendinginan prediktif berbasis perangkat lunak untuk pusat data. Model yang telah dilatih siap untuk diterapkan pada aplikasi web interaktif menggunakan Streamlit, sehingga mendukung antarmuka yang mudah digunakan serta demonstrasi sistem kepada pengguna dan pemangku kepentingan.
+Tool ini berhasil menunjukkan kelayakan optimasi pendinginan prediktif berbasis perangkat lunak untuk pusat data. Model yang telah dilatih kini diterapkan pada arsitektur web modern React + FastAPI.
 
 ## Lisensi
 
 Proyek ini dilisensikan di bawah MIT License. Lihat file [LICENSE](LICENSE) untuk informasi lebih lanjut.
+
+<a href="https://www.star-history.com/">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=vk22006/predictive-cooling-optimizer-for-data-centers&type=date&theme=dark&legend=top-left" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=vk22006/predictive-cooling-optimizer-for-data-centers&type=date&legend=top-left" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=vk22006/predictive-cooling-optimizer-for-data-centers&type=date&legend=top-left" />
+ </picture>
+</a>

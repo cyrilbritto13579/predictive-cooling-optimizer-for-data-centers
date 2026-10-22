@@ -9,7 +9,7 @@
 
 यह परियोजना डेटा केंद्रों की शीतलन प्रणालियों में ऊर्जा की अक्षमता को दूर करने के लिए विकसित की गई है। इसमें तापमान-आधारित पूर्वानुमान मॉडल विकसित किया गया है, जो चिलर के संचालन और शेड्यूलिंग को अनुकूलित करता है। इसका उद्देश्य तापीय सुरक्षा बनाए रखते हुए ऊर्जा खपत को कम करना है। पारंपरिक प्रतिक्रियाशील शीतलन प्रणालियाँ तापमान में परिवर्तन होने के बाद ही प्रतिक्रिया देती हैं, जिसके कारण ऊर्जा की बर्बादी होती है और चिलर का संचालन कम प्रभावी हो जाता है।
 
-![होम पेज](img/home_page.PNG "होम पेज")
+![होम पेज](img/homePage.png "होम पेज")
 
 ## परियोजना की कार्यप्रणाली
 
@@ -51,42 +51,50 @@ Feature Engineering के माध्यम से कुल 46 उन्न�
 pip install -r requirements.txt
 ```
 
-2. Command Prompt या PowerShell में परियोजना फ़ोल्डर में जाएँ:
+2. FastAPI बैकएंड सेवा चलाएँ (पोर्ट 8000):
 
 ```bash
-cd <your-file-path>
+uvicorn backend.main:app --host 127.0.0.1 --port 8000
 ```
 
-3. निम्न कमांड का उपयोग करके एप्लिकेशन चलाएँ:
+3. React फ्रंटएंड एप्लिकेशन चलाएँ (पोर्ट 5173):
 
 ```bash
-streamlit run 1_Home.py
+cd frontend
+npm install
+npm run dev
 ```
 
 ## उपयोग किए गए टूल्स
 
-1. Anaconda Jupyter - मॉडल प्रशिक्षण और परीक्षण के लिए
-2. Streamlit Library - फ्रंटएंड कार्यान्वयन के लिए
-3. Joblib - `.pkl` मॉडल फ़ाइलों को संभालने के लिए
-4. NumPy
-5. Pandas
-6. Scikit-Learn
-7. XGBoost
+1. Anaconda Jupyter - मॉडल प्रशिक्षण और वैज्ञानिक सत्यापन के लिए
+2. FastAPI & Uvicorn - बैकएंड गणना सेवा के लिए
+3. React & Vite - आधुनिक फ्रंटएंड इंटरफ़ेस के लिए
+4. NumPy, Pandas & Scikit-Learn
+5. XGBoost - मुख्य प्रतिगमन पूर्वानुमान इंजन
 
 ## उपयोग किए गए एल्गोरिदम
 
 ### 1. पूर्वानुमान एल्गोरिदम
 
 * XGBoost (Extreme Gradient Boosting)
-* Random Forest Regressor
+* Sequential Chained Regression (श्रृंखलाबद्ध प्रतिगमन अनुमान)
 
 ### 2. सहायक एल्गोरिदम
 
 * Min-Max Normalization
-* Rolling Average (Feature Engineering के लिए)
+* 46 फीचर इंजीनियरिंग (lag, rolling statistics, और interaction)
 
-यह टूल सॉफ्टवेयर-आधारित पूर्वानुमानित शीतलन अनुकूलन की व्यवहार्यता को सफलतापूर्वक प्रदर्शित करता है। प्रशिक्षित मॉडल Streamlit का उपयोग करके बनाए गए इंटरैक्टिव वेब एप्लिकेशन में परिनियोजित किए जाने के लिए तैयार हैं। इससे उपयोगकर्ता-अनुकूल इंटरफ़ेस, सिस्टम प्रदर्शन और संबंधित हितधारकों के समक्ष परियोजना के प्रदर्शन को संभव बनाया जा सकता है।
+यह टूल सॉफ्टवेयर-आधारित पूर्वानुमानित शीतलन अनुकूलन की व्यवहार्यता को सफलतापूर्वक प्रदर्शित करता है। प्रशिक्षित मॉडल अब React + FastAPI आधुनिक वेब आर्किटेक्चर पर पूरी तरह से एकीकृत हैं।
 
 ## लाइसेंस
 
 यह परियोजना MIT License के अंतर्गत लाइसेंस प्राप्त है। अधिक जानकारी के लिए [LICENSE](LICENSE) फ़ाइल देखें।
+
+<a href="https://www.star-history.com/">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=vk22006/predictive-cooling-optimizer-for-data-centers&type=date&theme=dark&legend=top-left" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=vk22006/predictive-cooling-optimizer-for-data-centers&type=date&legend=top-left" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=vk22006/predictive-cooling-optimizer-for-data-centers&type=date&legend=top-left" />
+ </picture>
+</a>

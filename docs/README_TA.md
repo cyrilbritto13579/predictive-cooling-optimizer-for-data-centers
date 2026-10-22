@@ -9,7 +9,7 @@
 
 இந்தத் திட்டம், தரவு மையங்களின் குளிரூட்டல் அமைப்புகளில் காணப்படும் ஆற்றல் திறனின்மையைத் தீர்க்கும் நோக்கில் உருவாக்கப்பட்டுள்ளது. வெப்பநிலையை அடிப்படையாகக் கொண்டு முன்கணிப்பு செய்யும் ஒரு மாதிரியை உருவாக்கி, சில்லர்களின் செயல்பாட்டு திட்டமிடலை மேம்படுத்துவதன் மூலம் ஆற்றல் நுகர்வைக் குறைப்பதோடு, வெப்பநிலை பாதுகாப்பு வரம்புகளையும் பராமரிக்கிறது. பாரம்பரிய எதிர்வினை அடிப்படையிலான குளிரூட்டல் அமைப்புகள் வெப்பநிலை மாற்றம் ஏற்பட்ட பிறகே அதற்கு பதிலளிக்கின்றன. இதனால் ஆற்றல் வீணாகுவதுடன், சில்லர்களின் செயல்பாடும் திறனற்றதாகிறது.
 
-![முகப்புப் பக்கம்](img/home_page.PNG "முகப்புப் பக்கம்")
+![முகப்புப் பக்கம்](img/homePage.png "முகப்புப் பக்கம்")
 
 ## திட்டத்தின் செயல்முறை
 
@@ -51,43 +51,50 @@
 pip install -r requirements.txt
 ```
 
-2. Command Prompt அல்லது PowerShell மூலம் திட்டக் கோப்புறைக்குச் செல்லவும்:
+2. FastAPI பின்தள சேவையை இயக்கவும் (போர்ட் 8000):
 
 ```bash
-cd <your-file-path>
+uvicorn backend.main:app --host 127.0.0.1 --port 8000
 ```
 
-3. கீழ்க்கண்ட கட்டளையைப் பயன்படுத்தி பயன்பாட்டை இயக்கவும்:
+3. React முன்பக்க பயன்பாட்டை இயக்கவும் (போர்ட் 5173):
 
 ```bash
-streamlit run 1_Home.py
+cd frontend
+npm install
+npm run dev
 ```
 
 ## பயன்படுத்தப்பட்ட கருவிகள்
 
-1. Anaconda Jupyter - மாதிரி பயிற்சி மற்றும் சோதனைக்காக
-2. Streamlit library - frontend செயல்படுத்தலுக்காக
-3. Joblib - `.pkl` மாதிரி கோப்புகளை கையாள்வதற்காக
-4. NumPy
-5. Pandas
-6. Scikit-Learn
-7. XGBoost
+1. Anaconda Jupyter - மாதிரி பயிற்சி மற்றும் அறிவியல் சரிபார்ப்புக்காக
+2. FastAPI & Uvicorn - பின்தள கணக்கீட்டு சேவைக்காக
+3. React & Vite - நவீன முன்பக்க இடைமுகத்திற்காக
+4. NumPy, Pandas & Scikit-Learn
+5. XGBoost - முதன்மை கணிப்பு இயந்திரம்
 
 ## பயன்படுத்தப்பட்ட அல்காரிதம்கள்
 
 ### 1. முன்கணிப்பு அல்காரிதம்கள்
 
 * XGBoost (Extreme Gradient Boosting)
-* Random Forest Regressor
+* Sequential Chained Regression (தொடர் கணிப்பு)
 
 ### 2. துணை அல்காரிதம்கள்
 
 * Min-Max Normalization
-* Rolling Average (feature engineering-க்காக)
+* 46 அம்ச பொறியியல் (lag, rolling statistics, மற்றும் interaction)
 
-இந்தக் கருவி, மென்பொருள் அடிப்படையிலான முன்கணிப்பு குளிரூட்டல் மேம்படுத்தலின் செயல்திறன் மற்றும் நடைமுறை சாத்தியத்தை வெற்றிகரமாக நிரூபிக்கிறது. மேலும், Streamlit பயன்படுத்தி உருவாக்கப்பட்ட ஊடாடும் வலைப் பயன்பாடுகள் மூலம் பயன்படுத்தத்தக்க வகையில் மாதிரிகள் தயார் நிலையில் உள்ளன. இதனால் பயனர்கள் மற்றும் தொடர்புடைய தரப்பினருக்கான விளக்கக்காட்சி மற்றும் பயன்பாடும் எளிதாகிறது.
+இந்தக் கருவி, மென்பொருள் அடிப்படையிலான முன்கணிப்பு குளிரூட்டல் மேம்படுத்தலின் செயல்திறன் மற்றும் நடைமுறை சாத்தியத்தை வெற்றிகரமாக நிரூபிக்கிறது. மாதிரிகள் தற்போது React + FastAPI நவீன வலை கட்டமைப்பில் முழுமையாக ஒருங்கிணைக்கப்பட்டுள்ளன.
 
 ## உரிமம்
 
 இந்தத் திட்டம் MIT License-ன் கீழ் உரிமம் பெற்றுள்ளது. விவரங்களுக்கு [LICENSE](LICENSE) கோப்பைப் பார்க்கவும்.
 
+<a href="https://www.star-history.com/">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=vk22006/predictive-cooling-optimizer-for-data-centers&type=date&theme=dark&legend=top-left" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=vk22006/predictive-cooling-optimizer-for-data-centers&type=date&legend=top-left" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=vk22006/predictive-cooling-optimizer-for-data-centers&type=date&legend=top-left" />
+ </picture>
+</a>

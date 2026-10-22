@@ -8,7 +8,7 @@
 
 本项目旨在解决数据中心冷却系统中的能源效率问题。项目通过开发一种基于温度感知的预测模型，对冷水机组的运行调度进行优化，从而在确保热安全的同时降低能源消耗。传统的响应式冷却系统通常会在温度变化发生后才进行响应，这容易造成能源浪费以及冷水机组运行效率低下。
 
-![主页](img/home_page.PNG "主页")
+![主页](img/homePage.png "主页")
 
 ## 项目方法
 
@@ -50,42 +50,50 @@
 pip install -r requirements.txt
 ```
 
-2. 在命令提示符（Command Prompt）或 PowerShell 中进入项目目录：
+2. 启动 FastAPI 后端服务（端口 8000）：
 
 ```bash
-cd <your-file-path>
+uvicorn backend.main:app --host 127.0.0.1 --port 8000
 ```
 
-3. 使用以下命令启动应用程序：
+3. 启动 React 前端应用（端口 5173）：
 
 ```bash
-streamlit run 1_Home.py
+cd frontend
+npm install
+npm run dev
 ```
 
 ## 使用的工具
 
-1. Anaconda Jupyter：用于模型训练与测试
-2. Streamlit：用于前端实现
-3. Joblib：用于处理 `.pkl` 模型文件
-4. NumPy
-5. Pandas
-6. Scikit-Learn
-7. XGBoost
+1. Anaconda Jupyter：用于初始模型训练与科学验证
+2. FastAPI 与 Uvicorn：用于高性能计算服务
+3. React 与 Vite：用于现代化前端交互界面
+4. NumPy、Pandas 与 Scikit-Learn
+5. XGBoost：核心回归预测引擎
 
 ## 使用的算法
 
 ### 1. 预测算法
 
 * XGBoost（Extreme Gradient Boosting，极端梯度提升）
-* Random Forest Regressor（随机森林回归）
+* Sequential Chained Regression（链式顺序推断）
 
 ### 2. 支持算法
 
 * Min-Max Normalization（最小-最大归一化）
-* Rolling Average（滚动平均，用于特征工程）
+* 46 维特征工程（滞后、滑动统计与交互特征）
 
-该工具成功验证了基于软件的数据中心预测性冷却优化方案的可行性。训练完成的模型可进一步部署于基于 Streamlit 的交互式 Web 应用中，从而便于实际操作、系统展示以及向相关利益相关者进行演示。
+该工具成功验证了基于软件的数据中心预测性冷却优化方案的可行性。训练完成的模型现已部署于基于 React + FastAPI 的现代 Web 架构中。
 
 ## 许可证
 
 本项目采用 MIT License 许可证。详情请参阅 [LICENSE](LICENSE) 文件。
+
+<a href="https://www.star-history.com/">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=vk22006/predictive-cooling-optimizer-for-data-centers&type=date&theme=dark&legend=top-left" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=vk22006/predictive-cooling-optimizer-for-data-centers&type=date&legend=top-left" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=vk22006/predictive-cooling-optimizer-for-data-centers&type=date&legend=top-left" />
+ </picture>
+</a>

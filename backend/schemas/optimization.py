@@ -13,10 +13,14 @@ class CandidatePointSchema(BaseModel):
     chilled_water_rate: float = Field(..., description="Resulting candidate chilled water flow rate in L/sec")
     predicted_energy_kwh: float = Field(..., description="Model-predicted chiller energy consumption in kWh")
     predicted_temp_c: Optional[float] = Field(None, description="Model-predicted cooling water temperature in °C")
+    energy_delta_kwh: float = Field(
+        0.0,
+        description="Model-estimated energy difference from baseline in kWh (candidate − baseline; negative indicates reduction)"
+    )
     is_selected: bool = Field(False, description="True if this candidate was selected as optimal")
     satisfies_temp_constraint: Optional[bool] = Field(
         None,
-        description="Whether this candidate satisfies the requested upper temperature constraint"
+        description="Whether this candidate satisfies the requested upper temperature constraint (None if unconstrained)"
     )
 
 
@@ -65,6 +69,18 @@ class OptimizationResponse(BaseModel):
     baseline_temp_c: Optional[float] = Field(None, description="Predicted baseline cooling-water temperature in °C")
     suggestion: str = Field(..., description="Human-readable recommendation")
     candidates: List[CandidatePointSchema] = Field(default_factory=list, description="All evaluated candidate points")
+    evaluation_status: str = Field(
+        "unconstrained",
+        description="Status of evaluation: 'unconstrained', 'constrained_optimal', or 'no_feasible_candidate'"
+    )
+    temperature_constraint_max: Optional[float] = Field(
+        None,
+        description="Applied maximum cooling water temperature constraint in °C, if any"
+    )
+    feasible_candidate_found: bool = Field(
+        True,
+        description="True if an eligible candidate meeting constraints was identified"
+    )
     units: Dict[str, str] = Field(
         default_factory=lambda: {"energy": "kWh", "flow_rate": "L/sec", "temperature": "°C"},
         description="Units of measurement"

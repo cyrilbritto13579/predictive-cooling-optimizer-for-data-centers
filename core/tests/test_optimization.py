@@ -144,3 +144,54 @@ class TestOptimizationCustomGrid:
             X, store, adjustments=custom, include_temp=False
         )
         assert len(result.candidates) == 3
+
+
+class TestOptimizationTemperatureConstraints:
+    """Verify temperature-constrained optimization in canonical core."""
+
+    def test_unconstrained_default(self, sample_df: pd.DataFrame, store: ModelStore):
+        """When temperature_constraint_max is None, evaluation status is unconstrained and candidates have satisfies_constraint=None."""
+        X = sample_df[store.energy_feature_names].iloc[0:1].copy()
+        result = optimize_cooling(X, store)
+        assert result.evaluation_status == "unconstrained"
+        assert result.temperature_constraint_max is None
+        assert result.feasible_candidate_found is True
+        for c in result.candidates:
+            assert c.satisfies_constraint is None
+
+    def test_constrained_optimal_selection(self, sample_df: pd.DataFrame, store: ModelStore):
+        """When constraint is generous (45 C), candidates satisfy and best candidate is selected."""
+        X = sample_df[store.energy_feature_names].iloc[0:1].copy()
+        result = optimize_cooling(X, store, temperature_constraint_max=45.0)
+        assert result.evaluation_status == "constrained_optimal"
+        assert result.temperature_constraint_max == 45.0
+        assert result.feasible_candidate_found is True
+        assert all(c.satisfies_constraint is True for c in result.candidates)
+        assert any(c.is_selected for c in result.candidates)
+
+    def test_no_feasible_candidate(self, sample_df: pd.DataFrame, store: ModelStore):
+        """When constraint is unrealistically low (20 C), all candidates violate and no candidate is selected."""
+        X = sample_df[store.energy_feature_names].iloc[0:1].copy()
+        result = optimize_cooling(X, store, temperature_constraint_max=20.0)
+        assert result.evaluation_status == "no_feasible_candidate"
+        assert result.feasible_candidate_found is False
+        assert result.optimized_energy_kwh == result.baseline_energy_kwh
+        assert result.energy_savings_kwh == 0.0
+        assert not any(c.is_selected for c in result.candidates)
+        assert all(c.satisfies_constraint is False for c in result.candidates)
+        assert "no candidate satisfies" in result.suggestion.lower()
+
+    def test_constrained_only_selects_satisfying(self, sample_df: pd.DataFrame, store: ModelStore):
+        """When constraint is tight, selected candidate must satisfy the constraint even if a violating candidate has lower energy."""
+        X = sample_df[store.energy_feature_names].iloc[0:1].copy()
+        # Find candidate temperatures under unconstrained run
+        unconstrained = optimize_cooling(X, store)
+        temps = [c.predicted_temp_c for c in unconstrained.candidates if c.predicted_temp_c is not None]
+        median_temp = sorted(temps)[len(temps) // 2]
+
+        constrained = optimize_cooling(X, store, temperature_constraint_max=median_temp)
+        if constrained.feasible_candidate_found:
+            selected = [c for c in constrained.candidates if c.is_selected]
+            if selected:
+                assert selected[0].satisfies_constraint is True
+                assert selected[0].predicted_temp_c <= median_temp

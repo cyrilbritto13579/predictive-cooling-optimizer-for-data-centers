@@ -122,43 +122,50 @@ class TestOptimizationEndpointQA:
         for cand in data_without_temp["candidates"]:
             assert cand["predicted_temp_c"] is None
 
-    def test_satisfies_temp_constraint_soft_reporting_no_filtering(self, client: TestClient, sample_row_0):
-        """Constraint check must populate satisfies_temp_constraint without dropping or altering candidate selection."""
+    def test_temperature_constraint_evaluation_and_gating(self, client: TestClient, sample_row_0):
+        """Constraint check must evaluate satisfies_temp_constraint, gate selection to eligible candidates, and return no_feasible_candidate when all violate."""
         # Unconstrained baseline
         res_base = client.post("/api/optimize", json={"pre_engineered_row": sample_row_0, "include_temp": True})
         assert res_base.status_code == 200
-        base_candidates = res_base.json()["candidates"]
+        data_base = res_base.json()
+        assert data_base["evaluation_status"] == "unconstrained"
+        assert data_base["temperature_constraint_max"] is None
+        base_candidates = data_base["candidates"]
         assert len(base_candidates) == 7
+        assert all(c["satisfies_temp_constraint"] is None for c in base_candidates)
         selected_cand_base = next(c for c in base_candidates if c["is_selected"])
 
-        # Very high constraint (e.g. 45.0 °C) -> all should satisfy
+        # Very high constraint (e.g. 45.0 °C) -> all should satisfy, constrained_optimal
         res_high = client.post(
             "/api/optimize",
             json={"pre_engineered_row": sample_row_0, "temperature_constraint_max": 45.0, "include_temp": True},
         )
         assert res_high.status_code == 200
-        high_candidates = res_high.json()["candidates"]
+        data_high = res_high.json()
+        assert data_high["evaluation_status"] == "constrained_optimal"
+        assert data_high["temperature_constraint_max"] == 45.0
+        high_candidates = data_high["candidates"]
         assert len(high_candidates) == 7
         assert all(c["satisfies_temp_constraint"] is True for c in high_candidates)
-        # Selection remains identical (no hard filtering)
         selected_cand_high = next(c for c in high_candidates if c["is_selected"])
         assert selected_cand_high["chilled_water_rate_adjustment"] == selected_cand_base["chilled_water_rate_adjustment"]
 
-        # Low constraint (e.g. 25.0 °C) -> candidates above 25.0 must report False
+        # Low constraint (e.g. 25.0 °C) -> candidates above 25.0 report False, no feasible candidate
         res_low = client.post(
             "/api/optimize",
             json={"pre_engineered_row": sample_row_0, "temperature_constraint_max": 25.0, "include_temp": True},
         )
         assert res_low.status_code == 200
-        low_candidates = res_low.json()["candidates"]
+        data_low = res_low.json()
+        assert data_low["evaluation_status"] == "no_feasible_candidate"
+        assert data_low["feasible_candidate_found"] is False
+        assert "no candidate satisfies" in data_low["suggestion"].lower()
+        low_candidates = data_low["candidates"]
         assert len(low_candidates) == 7
         for c in low_candidates:
             if c["predicted_temp_c"] is not None:
                 assert c["satisfies_temp_constraint"] == (c["predicted_temp_c"] <= 25.0)
-
-        # Confirm candidate selection is NOT modified by the soft constraint
-        selected_cand_low = next(c for c in low_candidates if c["is_selected"])
-        assert selected_cand_low["chilled_water_rate_adjustment"] == selected_cand_base["chilled_water_rate_adjustment"]
+        assert not any(c["is_selected"] for c in low_candidates)
 
     def test_disclaimer_present_and_accurate(self, client: TestClient, sample_row_0):
         """The API must explicitly disclaim counterfactual model estimation."""

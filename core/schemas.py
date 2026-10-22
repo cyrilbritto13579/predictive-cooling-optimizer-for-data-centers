@@ -76,11 +76,14 @@ class CandidatePoint:
         predicted_temp_c: model-predicted temperature at this operating
             point (if temp model is available).
         is_selected: True if this was the best candidate selected.
+        satisfies_constraint: Optional boolean indicating whether candidate
+            meets configured temperature constraint (None if unconstrained).
     """
     chilled_water_rate_adjustment: float
     predicted_energy_kwh: float
     predicted_temp_c: Optional[float] = None
     is_selected: bool = False
+    satisfies_constraint: Optional[bool] = None
 
 
 @dataclass(frozen=True)
@@ -96,6 +99,9 @@ class OptimizationResult:
             point (if temp model is available).
         suggestion: human-readable recommendation.
         candidates: all operating points evaluated during optimization.
+        evaluation_status: 'unconstrained' | 'constrained_optimal' | 'no_feasible_candidate'.
+        temperature_constraint_max: configured temperature threshold in °C, if any.
+        feasible_candidate_found: True if an eligible optimal candidate exists.
     """
     baseline_energy_kwh: float
     optimized_energy_kwh: float
@@ -104,6 +110,9 @@ class OptimizationResult:
     baseline_temp_c: Optional[float] = None
     suggestion: str = ""
     candidates: List[CandidatePoint] = field(default_factory=list)
+    evaluation_status: str = "unconstrained"
+    temperature_constraint_max: Optional[float] = None
+    feasible_candidate_found: bool = True
 
 
 # ---------------------------------------------------------------------------
