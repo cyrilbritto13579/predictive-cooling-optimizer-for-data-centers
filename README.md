@@ -10,7 +10,7 @@ English | [தமிழ்](docs/README_TA.md) | [中文](docs/README_ZH.md) | [
 
 Predictive Cooling Optimizer is a software-based machine learning analytics platform designed to model chiller electrical consumption and forecast condenser cooling-water thermal trajectories in data center HVAC facilities. The system pairs a high-performance **FastAPI** computational service with an industrial dark-themed **React + TypeScript + Vite** user interface.
 
-![home page](docs/img/home_page.PNG)
+![home page](docs/img/homePage.png)
 
 ---
 

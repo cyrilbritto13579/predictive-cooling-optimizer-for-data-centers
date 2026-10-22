@@ -8,7 +8,7 @@
 
 Proyek ini bertujuan untuk mengatasi ketidakefisienan energi pada sistem pendinginan pusat data dengan mengembangkan model prediktif berbasis suhu yang mengoptimalkan penjadwalan chiller untuk mengurangi konsumsi energi sambil mempertahankan keamanan termal. Sistem pendinginan reaktif tradisional merespons perubahan suhu setelah perubahan tersebut terjadi, sehingga menyebabkan pemborosan energi dan pengoperasian chiller yang kurang optimal.
 
-![Halaman utama](img/home_page.PNG "Halaman utama")
+![Halaman utama](img/homePage.png "Halaman utama")
 
 ## Metodologi Proyek
 
