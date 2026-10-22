@@ -37,7 +37,7 @@ export interface SensorReading {
   chiller_energy: number;
 }
 
-export interface HistoricalDataPoint extends SensorReading {}
+export type HistoricalDataPoint = SensorReading | Record<string, unknown>;
 
 export interface EnergyPredictionRequest {
   reading?: SensorReading;
