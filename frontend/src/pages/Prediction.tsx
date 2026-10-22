@@ -809,7 +809,7 @@ export const Prediction: React.FC = () => {
                 <div className="flex items-center gap-2 text-xs text-slate-400">
                   <Info className="w-4 h-4 text-cyan-400 shrink-0" />
                   <span>
-                    Canonical core derives 46 interaction, lag, and cyclic features on the backend.
+                    Canonical Python core derives 46 interaction, lag, and cyclic features using the 13-row baseline operational fixture (reproducible reference benchmark, not live telemetry).
                   </span>
                 </div>
                 <Button

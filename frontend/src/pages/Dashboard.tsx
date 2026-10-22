@@ -251,16 +251,16 @@ export const Dashboard: React.FC = () => {
         />
 
         <KpiCard
-          label="Optimization Potential"
+          label="Predicted Energy Delta"
           value={currentFrame ? `${(currentFrame.potential_savings_pct * 100).toFixed(1)}` : '—'}
           unit="%"
           icon={<TrendingDown className="w-4 h-4" />}
           delta={{
-            value: currentFrame ? 'Model Estimate' : 'Awaiting Data',
+            value: currentFrame ? 'Replay Frame' : 'Awaiting Data',
             trend: currentFrame && currentFrame.potential_savings_pct > 0 ? 'positive' : 'neutral',
-            label: 'vs lagged baseline',
+            label: 'vs 1-hr lag',
           }}
-          subtitle={currentFrame ? 'Counterfactual Trim' : 'Inactive'}
+          subtitle="vs. Lagged Reference"
         />
 
         <KpiCard
