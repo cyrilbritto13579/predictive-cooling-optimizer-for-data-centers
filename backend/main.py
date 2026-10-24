@@ -54,9 +54,20 @@ def create_app() -> FastAPI:
     # Configurable through environment variable; defaults to common local frontend ports
     raw_origins = os.getenv(
         "CORS_ORIGINS",
-        "http://localhost:3000,http://localhost:5173,http://127.0.0.1:3000,http://127.0.0.1:5173",
+        "http://localhost:3000,http://localhost:5173,http://127.0.0.1:3000,http://127.0.0.1:5173,https://predictive-cooling-optimizer.vercel.app",
     )
-    allowed_origins = [o.strip() for o in raw_origins.split(",") if o.strip()]
+    allowed_origins: list[str] = []
+    for o in raw_origins.split(","):
+        cleaned = o.strip().strip("'\"")
+        if not cleaned:
+            continue
+        if cleaned not in allowed_origins:
+            allowed_origins.append(cleaned)
+        # RFC 6454 dictates browser Origin headers never include a trailing slash.
+        # Normalize origins with trailing slashes so both forms are safely recognized.
+        without_slash = cleaned.rstrip("/")
+        if without_slash and without_slash not in allowed_origins:
+            allowed_origins.append(without_slash)
 
     app.add_middleware(
         CORSMiddleware,
