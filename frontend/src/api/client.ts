@@ -20,13 +20,22 @@ interface RequestOptions extends RequestInit {
   timeoutMs?: number;
 }
 
+/**
+ * Safely construct an absolute API endpoint URL without duplicate slashes.
+ */
+export function buildApiUrl(baseUrl: string, endpoint: string): string {
+  const cleanBase = (baseUrl || '').trim().replace(/\/+$/, '');
+  const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+  return `${cleanBase}${cleanEndpoint}`;
+}
+
 export async function apiClient<T>(
   endpoint: string,
   options: RequestOptions = {}
 ): Promise<T> {
-  const { timeoutMs = 15000, ...fetchOptions } = options;
+  const { timeoutMs = 30000, ...fetchOptions } = options;
 
-  const url = `${env.apiBaseUrl}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
+  const url = buildApiUrl(env.apiBaseUrl, endpoint);
 
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
