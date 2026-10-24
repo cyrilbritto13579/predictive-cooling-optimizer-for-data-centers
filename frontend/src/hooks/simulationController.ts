@@ -1,5 +1,6 @@
-// SPDX-License-Identifier: MIT
 import type { SimulationFrame, SimulationStepResponse } from '../types';
+import { ApiError } from '../api/client';
+import { env } from '../config/environment';
 
 export type PlaybackStatus = 'idle' | 'playing' | 'paused' | 'completed' | 'error';
 
@@ -12,6 +13,7 @@ export interface SimulationControllerState {
   totalSteps: number;
   isLoading: boolean;
   error: string | null;
+  errorDetail: string | null;
   stepError: string | null;
 }
 
@@ -51,6 +53,7 @@ export class SimulationPlaybackController {
       totalSteps: 100,
       isLoading: true,
       error: null,
+      errorDetail: null,
       stepError: null,
     };
   }
@@ -86,6 +89,7 @@ export class SimulationPlaybackController {
     this.updateState({
       isLoading: true,
       error: null,
+      errorDetail: null,
       stepError: null,
       playbackStatus: 'idle',
     });
@@ -108,14 +112,42 @@ export class SimulationPlaybackController {
         nextStepIndex: step0.next_state.current_index,
         isLoading: false,
         error: null,
+        errorDetail: null,
         playbackStatus: 'idle',
       });
     } catch (err: unknown) {
       if (this.runId !== currentRunId) return;
-      const msg = err instanceof Error ? err.message : 'Initialization failed.';
+      let msg = 'Initialization failed.';
+      let detail = 'Please verify the backend service is running and accessible.';
+
+      if (err instanceof ApiError) {
+        if (err.statusCode === 408 || err.errorType === 'TimeoutError') {
+          msg = 'Backend service request timed out.';
+          detail =
+            'The server took too long to respond. If running on a free cloud tier (e.g., Render), the instance may be waking up from sleep. Please retry in a few moments.';
+        } else if (err.statusCode === 0 || err.errorType === 'NetworkError') {
+          msg = 'Unable to connect to backend service.';
+          const origin = typeof window !== 'undefined' ? window.location.origin : 'this client';
+          detail = `Could not connect to ${env.apiBaseUrl}. Ensure the backend service is operational, reachable, and CORS permissions allow requests from ${origin}.`;
+        } else if (err.statusCode === 404) {
+          msg = 'Simulation endpoint not found (HTTP 404).';
+          detail = `The sample data or simulation endpoint was not found at ${env.apiBaseUrl}. Verify API base URL routing and endpoint paths.`;
+        } else if (err.statusCode >= 500) {
+          msg = `Backend service error (HTTP ${err.statusCode}).`;
+          detail = err.detail || 'The server encountered an error while retrieving simulation telemetry.';
+        } else {
+          msg = `API request failed (HTTP ${err.statusCode}).`;
+          detail = err.detail || 'The server rejected the simulation request.';
+        }
+      } else if (err instanceof Error) {
+        msg = err.message;
+        detail = 'Invalid or unexpected data received during simulation initialization.';
+      }
+
       this.updateState({
         isLoading: false,
         error: msg,
+        errorDetail: detail,
         playbackStatus: 'error',
       });
     }
@@ -156,6 +188,8 @@ export class SimulationPlaybackController {
         chartHistory: [this.initialFrame],
         currentStepIndex: 0,
         nextStepIndex: 1,
+        error: null,
+        errorDetail: null,
         stepError: null,
       });
     } else {
@@ -225,7 +259,16 @@ export class SimulationPlaybackController {
       }
 
       this.isPlaying = false;
-      const msg = err instanceof Error ? err.message : 'Step request failed.';
+      let msg = 'Step request failed.';
+      if (err instanceof ApiError) {
+        msg =
+          err.statusCode === 0
+            ? 'Connection lost during simulation step.'
+            : `Step request failed (HTTP ${err.statusCode}): ${err.detail}`;
+      } else if (err instanceof Error) {
+        msg = err.message;
+      }
+
       this.updateState({
         playbackStatus: 'error',
         stepError: msg,
