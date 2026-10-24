@@ -30,6 +30,7 @@ export const Dashboard: React.FC = () => {
     totalSteps,
     isLoading,
     error,
+    errorDetail,
     stepError,
     startPlayback,
     pausePlayback,
@@ -75,7 +76,7 @@ export const Dashboard: React.FC = () => {
         <ErrorState
           title="Simulation Initialization Failed"
           message={error}
-          detail="Ensure FastAPI backend is running on http://127.0.0.1:8000 and data/sample_test_data.csv is accessible."
+          detail={errorDetail || undefined}
           onRetry={retryInitialization}
         />
       </div>
