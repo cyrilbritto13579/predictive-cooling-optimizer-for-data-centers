@@ -55,6 +55,7 @@ class SimulationPlaybackControllerTest {
       totalSteps: 10,
       isLoading: true,
       error: null,
+      errorDetail: null,
       stepError: null,
     };
   }
