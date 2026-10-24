@@ -1,32 +1,48 @@
-# React + TypeScript + Vite
+# Predictive Cooling Optimizer — Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+A high-performance React 19 + TypeScript + Vite web application for data center predictive cooling optimization and chiller plant monitoring.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Industrial Dark Theme:** Built with Tailwind CSS and glassmorphism styling designed for mission-critical operations.
+- **Deterministic Live Simulation Dashboard (`/dashboard`):** Real-time synchronized time-series charts, key performance indicators, temperature safety bands, and counterfactual energy savings compared against historical operational baselines.
+- **Manual Prediction Console (`/prediction`):** 10-parameter raw telemetry input form with pre-configured scenario presets, client-side validation, out-of-training-support boundary warnings, and sequential dual-model inference.
+- **Interactive Optimization Explorer (`/optimization`):** Evaluates candidate flow rate setpoints across customizable maximum return water temperature constraints with tradeoff visualizations and candidate rankings.
+- **Model Introspection (`/models`):** Inspects preloaded XGBoost model artifacts, hyperparameters, feature engineering schemas, and regression performance metrics.
 
-## React Compiler
+## Development Setup
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Prerequisites
+- Node.js 18.x or higher
+- npm or yarn
 
-## Expanding the Oxlint configuration
+### Installation
+```bash
+# Install dependencies
+npm install
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+# Start development server (port 5173)
+npm run dev
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+### Environment Configuration
+Copy `.env.example` to `.env`:
+```bash
+VITE_API_BASE_URL=http://localhost:8000
+```
+
+### Testing & Verification
+```bash
+# Run unit and contract tests
+npm test -- --run
+
+# Validate production build and TypeScript types
+npm run build
+```
+
+## Architecture
+
+- **Framework:** React 19, Vite, TypeScript
+- **Styling & Components:** Tailwind CSS, Lucide React icons
+- **Data Visualization:** Canvas/SVG time-series & scatter-line charts
+- **API Client:** Typed REST client communicating with the FastAPI backend
